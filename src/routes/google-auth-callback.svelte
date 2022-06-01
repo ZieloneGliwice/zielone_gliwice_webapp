@@ -4,9 +4,7 @@
   import { page } from "$app/stores";
   import { routes } from "src/constants/routes.constant";
   import { isSignInLoading } from "src/stores/auth.store";
-  import type { ApiAuthenticationResponse } from "src/types/auth.types";
-  import { storeApiAccessToken } from "src/utils/auth-local-storage.utils";
-  import { env } from "src/utils/env.util";
+  import { setUserInfoAsync, signInToApiAsync } from "src/utils/auth.utils";
   import { onMount } from "svelte";
 
   onMount(async () => {
@@ -24,26 +22,8 @@
       throw new Error("Failed to sign in.");
     }
 
-    const signInResponse = await fetch(`${env.authApiOriginUri}/.auth/login/google`, {
-      method: "POST",
-      body: JSON.stringify({
-        id_token: idToken,
-        authorization_code: authorizationCode,
-        redirect_uri: `${env.originUri}/google-auth-callback`,
-      }),
-    });
-
-    if (signInResponse.status !== 200) {
-      isSignInLoading.set(false);
-
-      // TODO: redirect to some error page
-      throw new Error("Failed to sign in.");
-    }
-
-    const { authenticationToken } = (await signInResponse.json()) as ApiAuthenticationResponse;
-
-    storeApiAccessToken(authenticationToken);
-    isSignInLoading.set(false);
+    await signInToApiAsync({ providerType: "google", idToken, authorizationCode });
+    await setUserInfoAsync();
 
     goto(routes.home);
   });

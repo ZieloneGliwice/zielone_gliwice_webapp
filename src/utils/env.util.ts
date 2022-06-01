@@ -4,4 +4,5 @@ export const env = {
   originUri: process.env.ORIGIN_URI,
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleScope: process.env.GOOGLE_SCOPE,
+  facebookAppId: process.env.FACEBOOK_APP_ID,
 };

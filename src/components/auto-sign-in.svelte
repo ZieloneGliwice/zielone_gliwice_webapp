@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isSignInLoading, isUserSignedIn, user } from "src/stores/auth.store";
   import { getStoredApiAccessToken } from "src/utils/auth-local-storage.utils";
-  import { getUserInfoAsync } from "src/utils/get-user-info.utils";
+  import { setUserInfoAsync } from "src/utils/auth.utils";
   import { onMount } from "svelte";
 
   onMount(async () => {
@@ -20,14 +20,15 @@
       return;
     }
 
-    const userInfo = await getUserInfoAsync();
+    const token = getStoredApiAccessToken();
 
-    if (!userInfo) {
-      isSignInLoading.set(false);
+    if (!token) {
       return;
     }
 
-    user.set({ email: userInfo.user_id });
+    await setUserInfoAsync();
+
+    isSignInLoading.set(false);
     isUserSignedIn.set(true);
     isSignInLoading.set(false);
   });
